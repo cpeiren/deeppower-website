@@ -26,6 +26,19 @@
     if (e.persisted) root.classList.remove("leaving");
   });
 
+  /* Demo viewer ([data-demo]): one frame, one tab per demo. */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-demo]"), function (el) {
+    var tabs = el.querySelectorAll(".demo-tabs button"), panes = el.querySelectorAll(".pane");
+    Array.prototype.forEach.call(tabs, function (t, k) {
+      t.addEventListener("click", function () {
+        for (var n = 0; n < tabs.length; n++) {
+          tabs[n].classList.toggle("on", n === k);
+          panes[n].classList.toggle("on", n === k);
+        }
+      });
+    });
+  });
+
   /* Flow field: thin streamlines through a slowly shifting vector field.
      Its clock is carried across pages so the motion continues between them. */
   var c = document.querySelector("canvas.field");

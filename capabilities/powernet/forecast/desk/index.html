@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ERCOT Forecast Desk | DeepPower Technology</title>
+<meta name="description" content="Replay of every hourly ERCOT price forecast run of 2025, scored against the realized price.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one working screen. Run controls on top, price chart and hourly table in the
+   main column, run summary and dispatch planner in a fixed right rail. */
+:root {
+  --bg: #F3F4F6; --surface: #FFFFFF; --ink: #15191E; --ink-2: #4A535E; --muted: #717B87;
+  --line: #D9DDE2; --grid: #E8EBEE;
+  --fc: #1F5FA8; --fc-80: #D9E6F4; --fc-40: #B3CEEA;
+  --pick: #B4530A; --pick-bg: #F8E6D6;
+  --flag: #C62828; --flag-bg: #FBE9E7; --base-2: #A3ABB5;
+  --sans: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+  --mono: 'IBM Plex Mono', Consolas, 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101316; --surface: #171B1F; --ink: #E6E9EC; --ink-2: #AEB6BF; --muted: #838C96;
+  --line: #2B3138; --grid: #22272D;
+  --fc: #5A96DB; --fc-80: #1C3049; --fc-40: #284B76;
+  --pick: #D07F2A; --pick-bg: #3A2A18;
+  --flag: #EF6B5E; --flag-bg: #3A1F1C; --base-2: #5B636D; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #101316; --surface: #171B1F; --ink: #E6E9EC; --ink-2: #AEB6BF; --muted: #838C96;
+  --line: #2B3138; --grid: #22272D;
+  --fc: #5A96DB; --fc-80: #1C3049; --fc-40: #284B76;
+  --pick: #D07F2A; --pick-bg: #3A2A18;
+  --flag: #EF6B5E; --flag-bg: #3A1F1C; --base-2: #5B636D; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans) }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 0 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
+button, select, input { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--fc); outline-offset: 1px }
+
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-block: 14px; border-bottom: 1px solid var(--line) }
+.top h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: 0.01em }
+.mode { font-size: 12px; color: var(--pick); border: 1px solid var(--pick); padding: 1px 8px; border-radius: 2px }
+.tabs { display: flex; gap: 4px; margin-left: auto }
+.tabs a { padding: 5px 12px; color: var(--ink-2); text-decoration: none; border-radius: 2px; border: 1px solid transparent }
+.tabs a[aria-current="page"] { color: var(--ink); background: var(--surface); border-color: var(--line); font-weight: 500 }
+.note { margin: 12px 0 0; color: var(--ink-2); font-size: 13px; max-width: 110ch }
+
+.controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 16px; padding-block: 16px }
+.field { display: flex; flex-direction: column; gap: 3px }
+.field > span, .label { font-size: 12px; color: var(--muted) }
+input[type="date"], select, input[type="number"] { height: 32px; padding: 0 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 2px }
+.btns { display: flex; gap: 4px }
+.btn { height: 32px; padding: 0 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 2px; cursor: pointer }
+.btn:hover { border-color: var(--ink-2) }
+.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink) }
+.check { display: flex; align-items: center; gap: 6px; height: 32px }
+
+.desk { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0 }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 3px; padding: 14px 16px; min-width: 0 }
+.panel h2 { margin: 0 0 2px; font-size: 14px; font-weight: 600 }
+.panel .sub { margin: 0 0 10px; font-size: 12px; color: var(--muted) }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 6px }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { display: inline-block; width: 18px; height: 10px }
+.sw.line { height: 2px }
+.chart { position: relative }
+.chart svg { display: block; width: 100%; overflow: visible }
+.chart text { font: 11px var(--mono); fill: var(--muted) }
+.chart text.strong { fill: var(--ink); font-weight: 500 }
+.tip { position: absolute; top: 4px; pointer-events: none; background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); padding: 8px 10px; font-size: 12px; min-width: 170px; border-radius: 2px; z-index: 2 }
+.tip b { display: block; margin-bottom: 4px; font-weight: 600 }
+.tip div { display: flex; justify-content: space-between; gap: 16px; color: var(--ink-2) }
+
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; margin: 0 }
+.kv dt { color: var(--ink-2) }
+.kv dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums }
+.kv dd small { display: block; color: var(--muted); font-size: 11px }
+.kv .risk { color: var(--flag); font-weight: 500 }
+.rule { border: 0; border-top: 1px solid var(--line); margin: 12px 0 }
+.plan-form { display: flex; gap: 10px; margin-bottom: 12px }
+.plan-form .field { flex: 1 }
+.plan-form select, .plan-form input { width: 100% }
+.fine { font-size: 12px; color: var(--muted); margin: 10px 0 0 }
+
+.scroll { overflow: auto; max-height: 380px; border-top: 1px solid var(--line) }
+table { border-collapse: collapse; width: 100%; font-size: 13px }
+th, td { padding: 5px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid) }
+th { position: sticky; top: 0; background: var(--surface); color: var(--muted); font-weight: 500; font-size: 12px; border-bottom: 1px solid var(--line) }
+th:first-child, td:first-child { text-align: left }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums }
+tr.picked td:first-child { box-shadow: inset 3px 0 0 var(--pick) }
+.chip { font: 11px var(--sans); padding: 1px 6px; border-radius: 2px; color: var(--flag); background: var(--flag-bg) }
+.chip.pick { color: var(--pick); background: var(--pick-bg) }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding-block: 16px }
+.stat { border-top: 2px solid var(--ink); padding-top: 10px }
+.stat .big { font: 500 28px/1.1 var(--mono); font-variant-numeric: tabular-nums }
+.stat p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.prose { color: var(--ink-2); max-width: 75ch; margin: 8px 0 0 }
+#load { padding: 40px 0; color: var(--ink-2) }
+
+@media (max-width: 960px) {
+  .desk, .two { grid-template-columns: minmax(0, 1fr) }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .tabs { margin-left: 0 }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="/capabilities/powernet/" style="font:12px var(--mono);color:var(--muted);text-decoration:none;letter-spacing:.08em">&larr; POWERNET</a>
+    <h1>ERCOT Forecast Desk</h1>
+    <span class="mode">Replay: 2025 backtest</span>
+    <nav class="tabs" aria-label="Views">
+      <a href="#forecast" id="tab-forecast">Forecast</a>
+      <a href="#record" id="tab-record">Track record</a>
+    </nav>
+  </header>
+
+  <p id="load">Loading 2025 forecast runs...</p>
+
+  <main id="view-forecast" hidden>
+    <div class="controls">
+      <label class="field"><span>Forecast issued (CST)</span><input type="date" id="run-date" min="2025-01-01" max="2025-12-28"></label>
+      <label class="field"><span>Hour</span><select id="run-hour"></select></label>
+      <div class="field"><span>Step</span>
+        <div class="btns">
+          <button class="btn" id="b-day-back" title="Back one day">-1 d</button>
+          <button class="btn" id="b-hour-back" title="Back one hour">-1 h</button>
+          <button class="btn" id="b-hour-fwd" title="Forward one hour">+1 h</button>
+          <button class="btn" id="b-day-fwd" title="Forward one day">+1 d</button>
+          <button class="btn primary" id="b-play">Play</button>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="show-actual" checked> Show actual prices</label>
+    </div>
+
+    <div class="desk">
+      <div class="col">
+        <section class="panel">
+          <h2>Real-time price forecast, next 48 hours</h2>
+          <p class="sub" id="fan-sub"></p>
+          <div class="legend">
+            <span><i class="sw line" style="background:var(--fc)"></i>Median forecast</span>
+            <span><i class="sw" style="background:var(--fc-40)"></i>40% range</span>
+            <span><i class="sw" style="background:var(--fc-80)"></i>80% range</span>
+            <span id="lg-actual"><i class="sw line" style="background:var(--ink)"></i>Actual price</span>
+            <span><i class="sw" style="background:var(--flag);width:10px"></i>Spike risk: top of 80% range at $100 or more</span>
+            <span><i class="sw" style="background:var(--pick-bg);outline:1px solid var(--pick)"></i>Planned hours</span>
+          </div>
+          <div class="chart" id="fan"></div>
+          <p class="fine" id="fan-note"></p>
+        </section>
+        <section class="panel">
+          <h2>Hourly detail</h2>
+          <p class="sub">$/MWh. Each row is the hour starting at the time shown.</p>
+          <div class="scroll"><table id="hours"></table></div>
+        </section>
+      </div>
+
+      <aside class="col">
+        <section class="panel">
+          <h2>This run</h2>
+          <p class="sub" id="run-sub"></p>
+          <dl class="kv" id="run-kv"></dl>
+        </section>
+        <section class="panel">
+          <h2>Dispatch planner</h2>
+          <p class="sub">Picks hours in the next 24 using the median forecast.</p>
+          <div class="plan-form">
+            <label class="field"><span>Asset</span>
+              <select id="plan-mode"><option value="load">Flexible load</option><option value="battery">Battery, one cycle</option></select></label>
+            <label class="field"><span id="plan-hours-label">Run hours</span>
+              <input type="number" id="plan-hours" min="1" max="12" value="6"></label>
+          </div>
+          <dl class="kv" id="plan-kv"></dl>
+          <hr class="rule">
+          <p class="label" id="year-label"></p>
+          <dl class="kv" id="year-kv"></dl>
+          <p class="fine" id="plan-fine"></p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <main id="view-record" hidden>
+    <p class="note">Every hourly forecast run of 2025, scored against the actual ERCOT System Lambda. This backtest used an earlier version of the price engine.</p>
+    <div class="stats" id="rec-stats"></div>
+    <div class="two">
+      <section class="panel">
+        <h2>Error by hours ahead</h2>
+        <p class="sub">Mean absolute error of the median forecast, $/MWh. Lower is better.</p>
+        <div class="legend" id="lead-legend"></div>
+        <div class="chart" id="lead-chart"></div>
+      </section>
+      <section class="panel">
+        <h2>Error by month</h2>
+        <p class="sub">Mean absolute error, $/MWh, by delivery month.</p>
+        <div class="legend" id="month-legend"></div>
+        <div class="chart" id="month-chart"></div>
+      </section>
+      <section class="panel">
+        <h2>Range calibration</h2>
+        <p class="sub">How often the actual price fell below each forecast level.</p>
+        <table id="calib"></table>
+        <p class="prose" id="calib-note"></p>
+      </section>
+      <section class="panel">
+        <h2>How the numbers are built</h2>
+        <p class="prose"><b>Forecast.</b> A new run every hour, each covering the next 43 to 48 hours. The scored value is the median of the price distribution.</p>
+        <p class="prose"><b>Same hour, last known day.</b> The actual price of the same hour on the most recent day already settled when the forecast was made.</p>
+        <p class="prose"><b>Trailing 7-day median.</b> The median of the 168 hourly prices known when the forecast was made.</p>
+        <p class="prose"><b>Spike flag.</b> An hour is flagged when the top of its 80% range (the 90th percentile) is $100 or more.</p>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const L = 48, F = 6, DAY = 24;
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const S = { run: 0, showActual: true, timer: null, hover: null, yearCache: {} };
+const $ = id => document.getElementById(id);
+
+/* ---------- data ---------- */
+async function unpack(b64) {
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Int16Array(await new Response(stream).arrayBuffer());
+}
+async function loadData() {
+  // To go live, point this at the live forecast output in the same structure (see prep_data.py).
+  const raw = await (await fetch('desk-data.json')).json();
+  S.meta = raw.meta; S.stats = raw.meta.stats; S.nRuns = S.stats.n_runs;
+  [S.grid, S.actual] = await Promise.all([unpack(raw.grid), unpack(raw.actual)]);
+}
+const cell = (run, lead, k) => { const v = S.grid[(run * L + lead - 1) * F + k]; return v === S.meta.missing ? null : (k === 5 ? v * 4 : v / 10); };
+const actualAt = h => { const v = S.actual[h]; return v === undefined || v === S.meta.missing ? null : v / 10; };
+function runRows(run) {
+  const rows = [];
+  for (let lead = 1; lead <= L; lead++) {
+    const p50 = cell(run, lead, 2);
+    if (p50 === null) continue;
+    rows.push({ lead, h: run + lead, p10: cell(run, lead, 0), p30: cell(run, lead, 1), p50, p70: cell(run, lead, 3),
+      p90: cell(run, lead, 4), act: actualAt(run + lead) });
+  }
+  return rows;
+}
+
+/* ---------- formatting ---------- */
+const when = h => new Date(Date.UTC(2025, 0, 1) + h * 3600000);
+const pad = n => String(n).padStart(2, '0');
+const hhmm = h => pad(when(h).getUTCHours()) + ':00';
+const dayLabel = h => { const d = when(h); return `${DOW[d.getUTCDay()]} ${d.getUTCDate()} ${MON[d.getUTCMonth()]}`; };
+const stamp = h => `${dayLabel(h)} ${hhmm(h)}`;
+const usd = (v, d = 1) => v === null || v === undefined || Number.isNaN(v) ? '-' : (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const mean = a => a.reduce((s, v) => s + v, 0) / a.length;
+
+/* ---------- chart helpers ---------- */
+function niceTicks(lo, hi, n) {
+  const raw = (hi - lo) / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);
+  const ticks = [];
+  for (let v = Math.floor(lo / step) * step; v <= hi + step * 1e-9; v += step) ticks.push(+v.toFixed(6));
+  if (ticks[ticks.length - 1] < hi) ticks.push(ticks[ticks.length - 1] + step);
+  return ticks;
+}
+const pts = (xs, ys) => xs.map((x, i) => `${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+
+/* Shared time-axis frame for the two hourly charts: returns geometry plus the axis SVG. */
+function hourFrame(el, rows, height, ticks, fmtTick) {
+  const W = Math.max(320, el.clientWidth), m = { l: 48, r: 12, t: 22, b: 36 };
+  const step = (W - m.l - m.r) / (rows.length - 1);
+  const x = i => m.l + i * step;
+  const lo = ticks[0], hi = ticks[ticks.length - 1];
+  const y = v => m.t + (hi - v) / (hi - lo) * (height - m.t - m.b);
+  let axis = '';
+  ticks.forEach(t => { axis += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end">${fmtTick(t)}</text>`; });
+  rows.forEach((r, i) => {
+    const hr = r.h % DAY;
+    if (hr === 0) axis += `<line x1="${x(i)}" x2="${x(i)}" y1="${m.t}" y2="${height - m.b}" stroke="var(--line)" stroke-dasharray="3 3"/><text class="strong" x="${x(i)}" y="${height - 6}" text-anchor="middle">${dayLabel(r.h)}</text>`;
+    if (hr % 6 === 0) axis += `<text x="${x(i)}" y="${height - 20}" text-anchor="middle">${pad(hr)}:00</text>`;
+  });
+  return { W, m, x, y, step, axis, height };
+}
+/* Crosshair shared by both hourly charts; index i is the row under the pointer. */
+function bindHover(el, frame, rows) {
+  const svg = el.querySelector('svg');
+  const at = e => { const b = svg.getBoundingClientRect(); return Math.max(0, Math.min(rows.length - 1, Math.round((e.clientX - b.left - frame.m.l) / frame.step))); };
+  svg.addEventListener('pointermove', e => setHover(at(e)));
+  svg.addEventListener('pointerleave', () => setHover(null));
+}
+function setHover(i) {
+  S.hover = i;
+  for (const id of ['fan']) {
+    const el = $(id), f = el._frame, line = el.querySelector('.cross'), tip = el.querySelector('.tip');
+    if (!f) continue;
+    if (i === null) { line.setAttribute('visibility', 'hidden'); if (tip) tip.hidden = true; continue; }
+    line.setAttribute('visibility', 'visible'); line.setAttribute('x1', f.x(i)); line.setAttribute('x2', f.x(i));
+    if (!tip) continue;
+    const r = S.rows[i];
+    tip.innerHTML = `<b>${stamp(r.h)}</b>
+      <div><span>80% range</span><span class="num">${usd(r.p10)} to ${usd(r.p90)}</span></div>
+      <div><span>Median</span><span class="num">${usd(r.p50)}</span></div>
+      ${S.showActual && r.act !== null ? `<div><span>Actual</span><span class="num">${usd(r.act)}</span></div>` : ''}
+      <div><span>Hours ahead</span><span class="num">${r.lead}</span></div>`;
+    tip.hidden = false;
+    const left = f.x(i) + 14;
+    tip.style.left = (left + 190 > f.W ? f.x(i) - 14 - tip.offsetWidth : left) + 'px';
+  }
+}
+
+/* ---------- forecast view ---------- */
+function drawFan() {
+  const el = $('fan'), rows = S.rows, H = 360;
+  // Scale to the 40% range and the actuals; a long upper tail is clipped and reported under the chart.
+  const acts = S.showActual ? rows.filter(r => r.act !== null).map(r => r.act) : [];
+  const cap = Math.max(60, ...rows.map(r => r.p70)) * 1.6, maxP90 = Math.max(...rows.map(r => r.p90));
+  const top = Math.max(Math.min(maxP90, cap), Math.min(Math.max(0, ...acts), cap * 1.5)) * 1.05;
+  const floor = Math.max(-30, Math.min(0, ...rows.map(r => r.p10), ...acts));
+  // Ticks start at $0; a small negative floor extends the axis without its own label.
+  const ticks = niceTicks(0, top, 5), stepUsd = ticks[1] - ticks[0];
+  if (floor < 0) ticks.unshift(-floor < stepUsd * 0.4 ? floor : -stepUsd * Math.ceil(-floor / stepUsd));
+  const f = hourFrame(el, rows, H, ticks, t => t % stepUsd ? '' : usd(t, 0));
+  const hi = ticks[ticks.length - 1], xs = rows.map((_, i) => f.x(i)), rev = xs.slice().reverse();
+  const band = (a, b, fill) => `<polygon fill="${fill}" points="${pts(xs, rows.map(r => f.y(Math.min(hi, r[b]))))} ${pts(rev, rows.map(r => f.y(r[a])).reverse())}"/>`;
+  let g = '';
+  // planned hours sit behind the data
+  rows.forEach((r, i) => { const tag = S.plan.tags[r.lead]; if (tag) g += `<rect x="${f.x(i) - f.step / 2}" y="${f.m.t}" width="${f.step}" height="${H - f.m.t - f.m.b}" fill="var(--pick-bg)"/>`; });
+  g += f.axis + band('p10', 'p90', 'var(--fc-80)') + band('p30', 'p70', 'var(--fc-40)');
+  g += `<polyline fill="none" stroke="var(--fc)" stroke-width="2" stroke-linejoin="round" points="${pts(xs, rows.map(r => f.y(Math.min(hi, r.p50))))}"/>`;
+  if (S.showActual) {
+    const seen = rows.map((r, i) => ({ r, i })).filter(o => o.r.act !== null);
+    g += `<polyline fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" points="${seen.map(o => `${f.x(o.i).toFixed(1)},${f.y(Math.min(hi, o.r.act)).toFixed(1)}`).join(' ')}"/>`;
+  }
+  const notes = [], tail = rows.reduce((m, r) => r.p90 > m.p90 ? r : m), peak = rows.filter(r => r.act !== null).reduce((m, r) => !m || r.act > m.act ? r : m, null);
+  if (tail.p90 > hi) notes.push(`The 80% range runs above this scale, up to ${usd(tail.p90, 0)} at ${stamp(tail.h)}.`);
+  if (S.showActual && peak && peak.act > hi) notes.push(`The actual price peaked at ${usd(peak.act, 0)} at ${stamp(peak.h)}.`);
+  $('fan-note').textContent = notes.join(' ');
+  rows.forEach((r, i) => { if (r.p90 >= 100) g += `<rect x="${f.x(i) - 3}" y="${f.m.t - 7}" width="6" height="6" fill="var(--flag)"/>`; });
+  // label each planned block once, at its first hour
+  rows.forEach((r, i) => { const tag = S.plan.tags[r.lead]; if (tag && S.plan.tags[r.lead - 1] !== tag) g += `<text x="${f.x(i) - f.step / 2 + 3}" y="${H - f.m.b - 5}" style="fill:var(--pick)">${tag}</text>`; });
+  g += `<line class="cross" visibility="hidden" y1="${f.m.t}" y2="${H - f.m.b}" stroke="var(--ink-2)"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${f.W} ${H}" height="${H}" role="img" aria-label="Price forecast fan chart for the selected run">${g}</svg><div class="tip" hidden></div>`;
+  el._frame = f; bindHover(el, f, rows);
+}
+
+/* Planner: returns {tags: {lead: label}, exp, flatExp, real, flatReal} for one run.
+   load    - the k cheapest hours of the next 24 by median forecast
+   battery - one charge block then one later discharge block of k hours each, widest median spread */
+function plan(rows, mode, k) {
+  const win = rows.filter(r => r.lead <= DAY), tags = {};
+  const avg = (rs, key) => rs.some(r => r[key] === null) ? null : mean(rs.map(r => r[key]));
+  if (win.length < DAY) return null;
+  if (mode === 'load') {
+    const picks = win.slice().sort((a, b) => a.p50 - b.p50).slice(0, k);
+    picks.forEach(r => { tags[r.lead] = 'Run'; });
+    return { tags, exp: avg(picks, 'p50'), flatExp: avg(win, 'p50'), real: avg(picks, 'act'), flatReal: avg(win, 'act') };
+  }
+  let best = null;
+  for (let a = 0; a + 2 * k <= win.length; a++) for (let b = a + k; b + k <= win.length; b++) {
+    const spread = avg(win.slice(b, b + k), 'p50') - avg(win.slice(a, a + k), 'p50');
+    if (!best || spread > best.spread) best = { a, b, spread };
+  }
+  const chg = win.slice(best.a, best.a + k), dis = win.slice(best.b, best.b + k);
+  chg.forEach(r => { tags[r.lead] = 'Charge'; }); dis.forEach(r => { tags[r.lead] = 'Discharge'; });
+  const ca = avg(chg, 'act'), da = avg(dis, 'act');
+  return { tags, exp: best.spread, real: ca === null || da === null ? null : da - ca };
+}
+/* Same rule applied to every 2025 run issued at this hour of day, one decision per day. */
+function yearResult(mode, k, hourOfDay) {
+  const key = `${mode}|${k}|${hourOfDay}`;
+  if (S.yearCache[key]) return S.yearCache[key];
+  let days = 0, a = 0, b = 0, wins = 0;
+  for (let run = hourOfDay; run < S.nRuns; run += DAY) {
+    const p = plan(runRows(run), mode, k);
+    if (!p || p.real === null) continue;
+    days++;
+    if (mode === 'load') { a += p.real; b += p.flatReal; if (p.real < p.flatReal) wins++; }
+    else { a += p.real * k; if (p.real > 0) wins++; }
+  }
+  return (S.yearCache[key] = { days, a, b, wins });
+}
+
+function renderRunPanel() {
+  const rows = S.rows, win = rows.filter(r => r.lead <= DAY);
+  const peak = rows.reduce((m, r) => r.p50 > m.p50 ? r : m), flags = rows.filter(r => r.p90 >= 100);
+  let lowStart = 0, low = Infinity;
+  for (let i = 0; i + 4 <= win.length; i++) { const v = mean(win.slice(i, i + 4).map(r => r.p50)); if (v < low) { low = v; lowStart = i; } }
+  const scored = rows.filter(r => r.act !== null);
+  $('run-sub').textContent = `Issued ${stamp(S.run)} CST`;
+  $('fan-sub').textContent = `Issued ${stamp(S.run)} CST for ${stamp(rows[0].h)} to ${stamp(rows[rows.length - 1].h)}. ERCOT System Lambda, $/MWh.`;
+  let kv = `<dt>Median price, next 24 h</dt><dd>${usd(mean(win.map(r => r.p50)))}</dd>
+    <dt>Highest median hour</dt><dd>${usd(peak.p50)}<small>${stamp(peak.h)}</small></dd>
+    <dt>Cheapest 4-hour block</dt><dd>${usd(low)}<small>from ${stamp(win[lowStart].h)}</small></dd>
+    <dt>Spike-risk hours</dt><dd class="${flags.length ? 'risk' : ''}">${flags.length} of ${rows.length}<small>${flags.length ? 'first ' + stamp(flags[0].h) : 'none flagged'}</small></dd>`;
+  if (S.showActual && scored.length) {
+    const hits = flags.filter(r => r.act !== null && r.act >= 100).length;
+    kv += `<dt>Average miss, this run</dt><dd>${usd(mean(scored.map(r => Math.abs(r.p50 - r.act))))}<small>median vs actual, ${scored.length} hours</small></dd>`;
+    if (flags.length) kv += `<dt>Flagged hours at $100 or more</dt><dd>${hits} of ${flags.length}</dd>`;
+  }
+  $('run-kv').innerHTML = kv;
+}
+function renderPlanPanel() {
+  const mode = $('plan-mode').value, k = S.plan.k, p = S.plan, y = yearResult(mode, k, S.run % DAY);
+  const real = v => S.showActual ? usd(v) : 'hidden';
+  $('plan-hours-label').textContent = mode === 'load' ? 'Run hours' : 'Hours per leg';
+  if (mode === 'load') {
+    $('plan-kv').innerHTML = `<dt>Expected price, chosen hours</dt><dd>${usd(p.exp)}<small>all 24 hours: ${usd(p.flatExp)}</small></dd>
+      <dt>Actual price, chosen hours</dt><dd>${real(p.real)}<small>all 24 hours: ${real(p.flatReal)}</small></dd>`;
+    $('year-kv').innerHTML = `<dt>Average price paid</dt><dd>${usd(y.a / y.days)}<small>running flat: ${usd(y.b / y.days)}</small></dd>
+      <dt>Cost vs running flat</dt><dd>${((y.a / y.b - 1) * 100).toFixed(0)}%</dd>
+      <dt>Days cheaper than flat</dt><dd>${y.wins} of ${y.days}</dd>`;
+    $('plan-fine').textContent = 'Energy cost only, at the system-wide real-time price. Before delivery charges and location basis.';
+  } else {
+    $('plan-kv').innerHTML = `<dt>Expected spread</dt><dd>${usd(p.exp)}<small>discharge minus charge, $/MWh</small></dd>
+      <dt>Actual spread</dt><dd>${real(p.real)}</dd>`;
+    $('year-kv').innerHTML = `<dt>Total margin per MW</dt><dd>${usd(y.a, 0)}<small>${usd(y.a / y.days, 0)} per day on average</small></dd>
+      <dt>Days with a positive spread</dt><dd>${y.wins} of ${y.days}</dd>`;
+    $('plan-fine').textContent = 'One cycle a day at the system-wide real-time price. Before round-trip losses, fees and location basis.';
+  }
+  $('year-label').textContent = `Same rule on all ${y.days} days of 2025, planned at ${pad(S.run % DAY)}:00`;
+}
+function renderTable() {
+  const head = `<tr><th>Hour (CST)</th><th>Ahead</th><th>P10</th><th>Median</th><th>P90</th><th>Actual</th><th>Miss</th><th></th></tr>`;
+  $('hours').innerHTML = head + S.rows.map(r => {
+    const tag = S.plan.tags[r.lead], a = S.showActual && r.act !== null;
+    return `<tr class="${tag ? 'picked' : ''}"><td>${stamp(r.h)}</td><td>${r.lead} h</td><td>${usd(r.p10)}</td><td>${usd(r.p50)}</td><td>${usd(r.p90)}</td>
+      <td>${a ? usd(r.act) : '-'}</td><td>${a ? usd(r.act - r.p50) : '-'}</td>
+      <td>${r.p90 >= 100 ? '<span class="chip">Spike risk</span> ' : ''}${tag ? `<span class="chip pick">${tag}</span>` : ''}</td></tr>`;
+  }).join('');
+}
+function renderForecast() {
+  S.rows = runRows(S.run);
+  const k = Math.max(1, Math.min(12, parseInt($('plan-hours').value, 10) || 1));
+  S.plan = Object.assign(plan(S.rows, $('plan-mode').value, k) || { tags: {} }, { k });
+  const d = when(S.run);
+  $('run-date').value = `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  $('run-hour').value = d.getUTCHours();
+  $('lg-actual').hidden = !S.showActual;
+  drawFan(); renderRunPanel(); renderPlanPanel(); renderTable();
+}
+function setRun(run) { S.run = Math.max(0, Math.min(S.nRuns - 1, run)); renderForecast(); }
+function togglePlay() {
+  if (S.timer) { clearInterval(S.timer); S.timer = null; }
+  else S.timer = setInterval(() => { if (S.run >= S.nRuns - 1) togglePlay(); else setRun(S.run + 1); }, 900);
+  $('b-play').textContent = S.timer ? 'Pause' : 'Play';
+}
+/* Opening run: a 06:00 forecast with at least 3 flagged hours that did reach $100,
+   taking the one with the smallest average miss so the first screen shows a typical good day. */
+function openingRun() {
+  let best = 6, score = Infinity;
+  for (let run = 6; run < S.nRuns; run += DAY) {
+    const rows = runRows(run), scored = rows.filter(r => r.act !== null);
+    const hits = rows.filter(r => r.lead <= DAY && r.p90 >= 100 && r.act !== null && r.act >= 100).length;
+    if (hits < 3 || scored.length < rows.length) continue;
+    const miss = mean(scored.map(r => Math.abs(r.p50 - r.act)));
+    if (miss < score) { score = miss; best = run; }
+  }
+  return best;
+}
+
+/* ---------- track record view ---------- */
+function groupedBars(el, legendEl, cats, series, H) {
+  legendEl.innerHTML = series.map(s => `<span><i class="sw" style="background:${s.color}"></i>${s.name}</span>`).join('');
+  const W = Math.max(320, el.clientWidth), m = { l: 40, r: 8, t: 18, b: 26 };
+  const ticks = niceTicks(0, Math.max(...series.flatMap(s => s.values)), 4), hi = ticks[ticks.length - 1];
+  const y = v => m.t + (hi - v) / hi * (H - m.t - m.b), slot = (W - m.l - m.r) / cats.length;
+  const bw = Math.min(26, (slot - 14) / series.length - 2);
+  let g = ticks.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end">${usd(t, 0)}</text>`).join('');
+  cats.forEach((c, i) => {
+    const x0 = m.l + i * slot + (slot - series.length * (bw + 2)) / 2;
+    const tipText = series.map(s => `${s.name}: ${usd(s.values[i], 2)}`).join('\n');
+    g += `<g><title>${c}\n${tipText}</title><rect x="${m.l + i * slot}" y="${m.t}" width="${slot}" height="${H - m.t - m.b}" fill="transparent"/>`;
+    series.forEach((s, j) => { g += `<rect x="${x0 + j * (bw + 2)}" y="${y(s.values[i])}" width="${bw}" height="${y(0) - y(s.values[i])}" fill="${s.color}"/>`; });
+    g += `<text x="${m.l + i * slot + slot / 2}" y="${H - 8}" text-anchor="middle">${c}</text></g>`;
+  });
+  g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--ink-2)"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img">${g}</svg>`;
+}
+function renderRecord() {
+  const st = S.stats, o = st.overall, cut = (a, b) => Math.round((1 - a / b) * 100);
+  $('rec-stats').innerHTML = `
+    <div class="stat"><div class="big">${usd(o.model, 2)}</div><p>average miss per forecast hour, across ${st.n_hours.toLocaleString('en-US')} forecast hours</p></div>
+    <div class="stat"><div class="big">${cut(o.model, o.persist)}% lower</div><p>than using the same hour from the last known day (${usd(o.persist, 2)})</p></div>
+    <div class="stat"><div class="big">${st.inside_80}%</div><p>of actual prices fell inside the 80% range</p></div>
+    <div class="stat"><div class="big">${st.spike.hit}%</div><p>of spike-flagged hours reached $100, against ${st.spike.base}% of all hours</p></div>`;
+  const base = [{ name: 'Median forecast', color: 'var(--fc)' }, { name: 'Same hour, last known day', color: 'var(--ink-2)' }, { name: 'Trailing 7-day median', color: 'var(--base-2)' }];
+  groupedBars($('lead-chart'), $('lead-legend'), st.by_lead.map(r => r.label),
+    [{ ...base[0], values: st.by_lead.map(r => r.model) }, { ...base[1], values: st.by_lead.map(r => r.persist) }, { ...base[2], values: st.by_lead.map(r => r.week) }], 280);
+  groupedBars($('month-chart'), $('month-legend'), st.monthly.map(r => MON[r.month - 1]),
+    [{ ...base[0], values: st.monthly.map(r => r.model) }, { ...base[1], values: st.monthly.map(r => r.persist) }], 280);
+  $('calib').innerHTML = `<tr><th>Forecast level</th><th>Expected below</th><th>Actual below</th><th>Gap</th></tr>` +
+    st.calibration.map(c => `<tr><td>${c.q === 50 ? 'Median' : 'P' + c.q}</td><td>${c.q}%</td><td>${c.below}%</td><td>${(c.below - c.q > 0 ? '+' : '') + (c.below - c.q).toFixed(1)} pts</td></tr>`).join('');
+  const med = st.calibration.find(c => c.q === 50);
+  $('calib-note').textContent = `The outer levels are close to target. The median sits high: the actual price came in below it only ${med.below}% of the time, so in most hours the price settles in the lower half of the range.`;
+}
+
+/* ---------- wiring ---------- */
+function route() {
+  const view = location.hash === '#record' ? 'record' : 'forecast';
+  for (const v of ['forecast', 'record']) {
+    $('view-' + v).hidden = v !== view;
+    if (v === view) $('tab-' + v).setAttribute('aria-current', 'page'); else $('tab-' + v).removeAttribute('aria-current');
+  }
+  if (view === 'record') renderRecord(); else renderForecast();
+}
+function wire() {
+  $('run-hour').innerHTML = Array.from({ length: DAY }, (_, h) => `<option value="${h}">${pad(h)}:00</option>`).join('');
+  const fromInputs = () => { const [y, mo, d] = $('run-date').value.split('-').map(Number); if (y) setRun((Date.UTC(y, mo - 1, d) - Date.UTC(2025, 0, 1)) / 3600000 + Number($('run-hour').value)); };
+  $('run-date').addEventListener('change', fromInputs); $('run-hour').addEventListener('change', fromInputs);
+  [['b-day-back', -DAY], ['b-hour-back', -1], ['b-hour-fwd', 1], ['b-day-fwd', DAY]].forEach(([id, d]) => $(id).addEventListener('click', () => setRun(S.run + d)));
+  $('b-play').addEventListener('click', togglePlay);
+  $('show-actual').addEventListener('change', e => { S.showActual = e.target.checked; renderForecast(); });
+  $('plan-mode').addEventListener('change', renderForecast); $('plan-hours').addEventListener('change', renderForecast);
+  document.addEventListener('keydown', e => {
+    if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) || $('view-forecast').hidden) return;
+    if (e.key === 'ArrowLeft') setRun(S.run - 1); if (e.key === 'ArrowRight') setRun(S.run + 1);
+  });
+  window.addEventListener('hashchange', route);
+  // charts are drawn to the container's pixel width, so redraw whenever that width changes
+  let t, lastW = 0;
+  new ResizeObserver(([e]) => { const w = Math.round(e.contentRect.width); if (w === lastW) return; lastW = w; clearTimeout(t); t = setTimeout(route, 100); }).observe(document.querySelector('.wrap'));
+}
+loadData().then(() => { wire(); S.run = openingRun(); $('load').hidden = true; route(); })
+  .catch(err => { $('load').textContent = 'Could not load the forecast data file (desk-data.json): ' + err.message; });
+</script>
+</body>
+</html>

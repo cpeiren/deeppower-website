@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ERCOT Price Forecast | DeepPower Technology</title>
+<meta name="description" content="An hourly ERCOT price forecast for the next 48 hours, with its full 2025 track record.">
+<meta property="og:title" content="ERCOT Price Forecast | DeepPower Technology">
+<meta property="og:description" content="An hourly ERCOT price forecast for the next 48 hours, with its full 2025 track record.">
+<meta property="og:url" content="https://deeppower-tech.com/capabilities/powernet/forecast/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://deeppower-tech.com/capabilities/powernet/forecast/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="/" aria-label="DeepPower Technology home">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="0" y="2" width="20" height="3" fill="currentColor"/><rect x="0" y="8.5" width="14" height="3" fill="currentColor"/><rect x="0" y="15" width="8" height="3" fill="currentColor"/></svg>
+      DEEPPOWER
+    </a>
+    <nav class="links" aria-label="Primary">
+      <a href="/about/">About</a>
+      <div class="dd"><a href="/capabilities/" aria-current="page">Capabilities</a><div class="menu"><div class="menu-in"><a href="/capabilities/powernet/">PowerNet</a><a class="sub" href="/capabilities/powernet/forecast/">Price forecast</a><a class="sub" href="/capabilities/powernet/scheduling/">Scheduling</a><a href="/capabilities/tradecontrol/">TradeControl</a><a class="sub" href="/capabilities/tradecontrol/research/">Research pipeline</a><a class="sub" href="/capabilities/tradecontrol/operations/">Operations</a></div></div></div>
+      <a href="/firm/">Firm</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="head">
+  <canvas class="field" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="label rise" style="--d:0"><a href="/capabilities/">Capabilities</a><span class="sep">/</span><a href="/capabilities/powernet/">PowerNet</a><span class="sep">/</span>Price forecast</div>
+    <h1 class="rise" style="--d:1">Seeing ERCOT prices 48 hours out.</h1>
+    <p class="sub rise" style="--d:2">Every hour, a price distribution for each of the next 48 hours.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="stats">
+      <div class="rise" style="--d:3"><span class="v">29%</span><span class="c">lower price error than the same-hour-yesterday rule, across 393,939 forecast hours in 2025</span></div>
+      <div class="rise" style="--d:4"><span class="v">$13.0</span><span class="c">average error per forecast hour, $/MWh, against $18.3 for the same-hour-yesterday rule</span></div>
+      <div class="rise" style="--d:5"><span class="v">26%</span><span class="c">of the hours it flags as spike risk go on to clear $100, against 2.6% of all hours</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="grid">
+      <div class="label">Track record</div>
+      <div class="fig">
+        <div class="key"><span><i style="background:#e9eaec"></i>DeepPower forecast</span><span><i style="background:#5b616b"></i>Same hour, last known day</span><span><i style="background:#3a3f47"></i>Trailing 7-day median</span></div>
+        <svg viewBox="0 0 880 220" role="img"><line x1="40" x2="880" y1="192.0" y2="192.0" stroke="#24272d"/><text x="32" y="196.0" text-anchor="end">$0</text><line x1="40" x2="880" y1="148.0" y2="148.0" stroke="#24272d"/><text x="32" y="152.0" text-anchor="end">$5</text><line x1="40" x2="880" y1="104.0" y2="104.0" stroke="#24272d"/><text x="32" y="108.0" text-anchor="end">$10</text><line x1="40" x2="880" y1="60.0" y2="60.0" stroke="#24272d"/><text x="32" y="64.0" text-anchor="end">$15</text><line x1="40" x2="880" y1="16.0" y2="16.0" stroke="#24272d"/><text x="32" y="20.0" text-anchor="end">$20</text><rect x="74.0" y="78.7" width="32.0" height="113.3" fill="#e9eaec"><title>12.9</title></rect><rect x="108.0" y="40.5" width="32.0" height="151.5" fill="#5b616b"><title>17.2</title></rect><rect x="142.0" y="56.8" width="32.0" height="135.2" fill="#3a3f47"><title>15.4</title></rect><text x="124.0" y="212" text-anchor="middle">1-6 h</text><rect x="242.0" y="78.3" width="32.0" height="113.7" fill="#e9eaec"><title>12.9</title></rect><rect x="276.0" y="40.5" width="32.0" height="151.5" fill="#5b616b"><title>17.2</title></rect><rect x="310.0" y="55.7" width="32.0" height="136.3" fill="#3a3f47"><title>15.5</title></rect><text x="292.0" y="212" text-anchor="middle">7-12 h</text><rect x="410.0" y="77.8" width="32.0" height="114.2" fill="#e9eaec"><title>13.0</title></rect><rect x="444.0" y="40.4" width="32.0" height="151.6" fill="#5b616b"><title>17.2</title></rect><rect x="478.0" y="54.6" width="32.0" height="137.4" fill="#3a3f47"><title>15.6</title></rect><text x="460.0" y="212" text-anchor="middle">13-24 h</text><rect x="578.0" y="77.3" width="32.0" height="114.7" fill="#e9eaec"><title>13.0</title></rect><rect x="612.0" y="20.3" width="32.0" height="171.7" fill="#5b616b"><title>19.5</title></rect><rect x="646.0" y="53.1" width="32.0" height="138.9" fill="#3a3f47"><title>15.8</title></rect><text x="628.0" y="212" text-anchor="middle">25-36 h</text><rect x="746.0" y="75.8" width="32.0" height="116.2" fill="#e9eaec"><title>13.2</title></rect><rect x="780.0" y="19.3" width="32.0" height="172.7" fill="#5b616b"><title>19.6</title></rect><rect x="814.0" y="51.9" width="32.0" height="140.1" fill="#3a3f47"><title>15.9</title></rect><text x="796.0" y="212" text-anchor="middle">37-48 h</text></svg>
+        <div class="cap">Average error by hours ahead, $/MWh. Lower is better.</div>
+      </div>
+      <a class="cta gap" href="/capabilities/powernet/forecast/desk/">Replay every 2025 forecast run on the forecast desk <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <p class="fine gap">2025 hourly backtest, 8,682 runs scored against ERCOT System Lambda. The backtest ran on an earlier version of the engine than the one in use today. Spike flag: the 90th percentile of the forecast at or above $100.</p>
+    </div>
+  </div>
+</section>
+
+<section class="next pager">
+  <div class="wrap">
+    <ul class="rows links">
+      <li><a class="row" href="/capabilities/powernet/"><span class="n">&larr; Back</span><span class="name">PowerNet</span><span class="desc"></span></a></li>
+      <li><a class="row" href="/capabilities/powernet/scheduling/"><span class="n">Next</span><span class="name">Scheduling</span><span class="desc"></span><span class="arr" aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; <span id="yr">2026</span> DeepPower Technology</span>
+    <span>deeppower-tech.com</span>
+  </div>
+</footer>
+</body>
+</html>

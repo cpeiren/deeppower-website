@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PowerNet Scheduling | DeepPower Technology</title>
+<meta name="description" content="PowerNet schedules a data center's battery and job queue in one optimization, tested without hindsight. Open source.">
+<meta property="og:title" content="PowerNet Scheduling | DeepPower Technology">
+<meta property="og:description" content="PowerNet schedules a data center's battery and job queue in one optimization, tested without hindsight. Open source.">
+<meta property="og:url" content="https://deeppower-tech.com/capabilities/powernet/scheduling/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="canonical" href="https://deeppower-tech.com/capabilities/powernet/scheduling/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="/" aria-label="DeepPower Technology home">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="0" y="2" width="20" height="3" fill="currentColor"/><rect x="0" y="8.5" width="14" height="3" fill="currentColor"/><rect x="0" y="15" width="8" height="3" fill="currentColor"/></svg>
+      DEEPPOWER
+    </a>
+    <nav class="links" aria-label="Primary">
+      <a href="/about/">About</a>
+      <div class="dd"><a href="/capabilities/" aria-current="page">Capabilities</a><div class="menu"><div class="menu-in"><a href="/capabilities/powernet/">PowerNet</a><a class="sub" href="/capabilities/powernet/forecast/">Price forecast</a><a class="sub" href="/capabilities/powernet/scheduling/">Scheduling</a><a href="/capabilities/tradecontrol/">TradeControl</a><a class="sub" href="/capabilities/tradecontrol/research/">Research pipeline</a><a class="sub" href="/capabilities/tradecontrol/operations/">Operations</a></div></div></div>
+      <a href="/firm/">Firm</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="head">
+  <canvas class="field" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="label rise" style="--d:0"><a href="/capabilities/">Capabilities</a><span class="sep">/</span><a href="/capabilities/powernet/">PowerNet</a><span class="sep">/</span>Scheduling</div>
+    <h1 class="rise" style="--d:1">The battery and the job queue, decided together.</h1>
+    <p class="sub rise" style="--d:2">For AI data centers in ERCOT. Open source.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="stats">
+      <div class="rise" style="--d:3"><span class="v">16-28%</span><span class="c">lower power cost per unit of compute with known prices, against a site that runs jobs as they arrive with no battery</span></div>
+      <div class="rise" style="--d:4"><span class="v">4-8%</span><span class="c">lower cost from the controller that sees only forecasts, re-planning every hour</span></div>
+      <div class="rise" style="--d:5"><span class="v">7-17%</span><span class="c">lower monthly peak demand from the forecast-driven controller</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <ul class="rows">
+      <li><div class="row"><span class="n">01</span><span class="name">One decision, not two</span><span class="desc">Battery optimizers ignore the workload. Job schedulers ignore the battery. PowerNet decides both in one optimization, so they never work against each other.</span></div></li>
+      <li><div class="row"><span class="n">02</span><span class="name">Tested without hindsight</span><span class="desc">We report two numbers: what perfect price knowledge would save, and what a controller that sees only forecasts actually saves. Most claims quote only the first.</span></div></li>
+      <li><div class="row"><span class="n">03</span><span class="name">Open source</span><span class="desc">The site simulator, battery model and optimizer are public. Every number on this page can be reproduced from public ERCOT data.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="grid">
+      <div class="label">Three days</div>
+      <div class="fig">
+        <div class="key"><span><i style="background:#8d929b"></i>ERCOT price, $/MWh</span><span><i style="background:#5b616b"></i>Grid power, jobs run as they arrive, kW</span><span><i style="background:#e9eaec"></i>Grid power, PowerNet controller, kW</span></div>
+        <svg viewBox="0 0 880 330" role="img"><line x1="44" x2="880" y1="114.0" y2="114.0" stroke="#24272d"/><text x="36" y="118.0" text-anchor="end">$0</text><line x1="44" x2="880" y1="80.7" y2="80.7" stroke="#24272d"/><text x="36" y="84.7" text-anchor="end">$60</text><line x1="44" x2="880" y1="47.3" y2="47.3" stroke="#24272d"/><text x="36" y="51.3" text-anchor="end">$120</text><line x1="44" x2="880" y1="14.0" y2="14.0" stroke="#24272d"/><text x="36" y="18.0" text-anchor="end">$180</text><polygon points="44.0,114.0 44.0,84.3 55.8,84.3 55.8,81.6 67.5,81.6 67.5,82.1 79.3,82.1 79.3,81.7 91.1,81.7 91.1,85.1 102.9,85.1 102.9,80.9 114.6,80.9 114.6,75.5 126.4,75.5 126.4,75.2 138.2,75.2 138.2,77.9 150.0,77.9 150.0,83.8 161.7,83.8 161.7,83.2 173.5,83.2 173.5,83.3 185.3,83.3 185.3,81.4 197.1,81.4 197.1,78.9 208.8,78.9 208.8,75.9 220.6,75.9 220.6,72.0 232.4,72.0 232.4,81.0 244.2,81.0 244.2,79.0 255.9,79.0 255.9,77.9 267.7,77.9 267.7,82.5 279.5,82.5 279.5,83.7 291.3,83.7 291.3,87.9 303.0,87.9 303.0,94.3 314.8,94.3 314.8,97.5 326.6,97.5 326.6,95.4 338.4,95.4 338.4,95.9 350.1,95.9 350.1,90.6 361.9,90.6 361.9,87.9 373.7,87.9 373.7,81.3 385.5,81.3 385.5,69.9 397.2,69.9 397.2,65.5 409.0,65.5 409.0,64.4 420.8,64.4 420.8,68.9 432.6,68.9 432.6,79.4 444.3,79.4 444.3,89.9 456.1,89.9 456.1,95.9 467.9,95.9 467.9,99.5 479.7,99.5 479.7,101.7 491.4,101.7 491.4,108.6 503.2,108.6 503.2,114.0 515.0,114.0 515.0,108.4 526.8,108.4 526.8,89.8 538.5,89.8 538.5,83.3 550.3,83.3 550.3,90.0 562.1,90.0 562.1,89.3 573.9,89.3 573.9,90.8 585.6,90.8 585.6,93.2 597.4,93.2 597.4,100.4 609.2,100.4 609.2,100.5 621.0,100.5 621.0,101.0 632.7,101.0 632.7,101.3 644.5,101.3 644.5,101.3 656.3,101.3 656.3,98.7 668.1,98.7 668.1,80.1 679.8,80.1 679.8,49.3 691.6,49.3 691.6,47.9 703.4,47.9 703.4,92.6 715.2,92.6 715.2,108.7 726.9,108.7 726.9,108.6 738.7,108.6 738.7,112.1 750.5,112.1 750.5,114.0 762.3,114.0 762.3,114.0 774.0,114.0 774.0,114.0 785.8,114.0 785.8,114.0 797.6,114.0 797.6,110.4 809.4,110.4 809.4,96.3 821.1,96.3 821.1,93.7 832.9,93.7 832.9,95.8 844.7,95.8 844.7,98.7 856.5,98.7 856.5,99.2 868.2,99.2 868.2,99.7 880.0,99.7 880.0,97.7 880.0,114.0" fill="rgba(141,146,155,.14)"/><polyline points="44.0,84.3 55.8,84.3 55.8,81.6 67.5,81.6 67.5,82.1 79.3,82.1 79.3,81.7 91.1,81.7 91.1,85.1 102.9,85.1 102.9,80.9 114.6,80.9 114.6,75.5 126.4,75.5 126.4,75.2 138.2,75.2 138.2,77.9 150.0,77.9 150.0,83.8 161.7,83.8 161.7,83.2 173.5,83.2 173.5,83.3 185.3,83.3 185.3,81.4 197.1,81.4 197.1,78.9 208.8,78.9 208.8,75.9 220.6,75.9 220.6,72.0 232.4,72.0 232.4,81.0 244.2,81.0 244.2,79.0 255.9,79.0 255.9,77.9 267.7,77.9 267.7,82.5 279.5,82.5 279.5,83.7 291.3,83.7 291.3,87.9 303.0,87.9 303.0,94.3 314.8,94.3 314.8,97.5 326.6,97.5 326.6,95.4 338.4,95.4 338.4,95.9 350.1,95.9 350.1,90.6 361.9,90.6 361.9,87.9 373.7,87.9 373.7,81.3 385.5,81.3 385.5,69.9 397.2,69.9 397.2,65.5 409.0,65.5 409.0,64.4 420.8,64.4 420.8,68.9 432.6,68.9 432.6,79.4 444.3,79.4 444.3,89.9 456.1,89.9 456.1,95.9 467.9,95.9 467.9,99.5 479.7,99.5 479.7,101.7 491.4,101.7 491.4,108.6 503.2,108.6 503.2,114.0 515.0,114.0 515.0,108.4 526.8,108.4 526.8,89.8 538.5,89.8 538.5,83.3 550.3,83.3 550.3,90.0 562.1,90.0 562.1,89.3 573.9,89.3 573.9,90.8 585.6,90.8 585.6,93.2 597.4,93.2 597.4,100.4 609.2,100.4 609.2,100.5 621.0,100.5 621.0,101.0 632.7,101.0 632.7,101.3 644.5,101.3 644.5,101.3 656.3,101.3 656.3,98.7 668.1,98.7 668.1,80.1 679.8,80.1 679.8,49.3 691.6,49.3 691.6,47.9 703.4,47.9 703.4,92.6 715.2,92.6 715.2,108.7 726.9,108.7 726.9,108.6 738.7,108.6 738.7,112.1 750.5,112.1 750.5,114.0 762.3,114.0 762.3,114.0 774.0,114.0 774.0,114.0 785.8,114.0 785.8,114.0 797.6,114.0 797.6,110.4 809.4,110.4 809.4,96.3 821.1,96.3 821.1,93.7 832.9,93.7 832.9,95.8 844.7,95.8 844.7,98.7 856.5,98.7 856.5,99.2 868.2,99.2 868.2,99.7 880.0,99.7 880.0,97.7" fill="none" stroke="#8d929b" stroke-width="1.5" stroke-linejoin="round"/><line x1="44" x2="880" y1="300.0" y2="300.0" stroke="#24272d"/><text x="36" y="304.0" text-anchor="end">0</text><line x1="44" x2="880" y1="250.0" y2="250.0" stroke="#24272d"/><text x="36" y="254.0" text-anchor="end">200</text><line x1="44" x2="880" y1="200.0" y2="200.0" stroke="#24272d"/><text x="36" y="204.0" text-anchor="end">400</text><line x1="44" x2="880" y1="150.0" y2="150.0" stroke="#24272d"/><text x="36" y="154.0" text-anchor="end">600</text><polyline points="44.0,213.2 55.8,213.2 55.8,225.3 67.5,225.3 67.5,224.7 79.3,224.7 79.3,222.8 91.1,222.8 91.1,218.1 102.9,218.1 102.9,219.6 114.6,219.6 114.6,206.4 126.4,206.4 126.4,203.0 138.2,203.0 138.2,216.5 150.0,216.5 150.0,215.7 161.7,215.7 161.7,205.5 173.5,205.5 173.5,199.5 185.3,199.5 185.3,179.1 197.1,179.1 197.1,185.4 208.8,185.4 208.8,201.8 220.6,201.8 220.6,203.2 232.4,203.2 232.4,197.8 244.2,197.8 244.2,193.6 255.9,193.6 255.9,191.9 267.7,191.9 267.7,189.7 279.5,189.7 279.5,187.2 291.3,187.2 291.3,192.0 303.0,192.0 303.0,191.1 314.8,191.1 314.8,197.0 326.6,197.0 326.6,207.5 338.4,207.5 338.4,206.0 350.1,206.0 350.1,205.8 361.9,205.8 361.9,211.7 373.7,211.7 373.7,203.9 385.5,203.9 385.5,221.2 397.2,221.2 397.2,208.0 409.0,208.0 409.0,216.8 420.8,216.8 420.8,217.4 432.6,217.4 432.6,219.4 444.3,219.4 444.3,219.8 456.1,219.8 456.1,226.0 467.9,226.0 467.9,221.7 479.7,221.7 479.7,223.3 491.4,223.3 491.4,217.5 503.2,217.5 503.2,222.1 515.0,222.1 515.0,212.1 526.8,212.1 526.8,205.3 538.5,205.3 538.5,191.9 550.3,191.9 550.3,188.8 562.1,188.8 562.1,195.5 573.9,195.5 573.9,190.9 585.6,190.9 585.6,195.8 597.4,195.8 597.4,213.9 609.2,213.9 609.2,211.5 621.0,211.5 621.0,210.5 632.7,210.5 632.7,217.9 644.5,217.9 644.5,216.6 656.3,216.6 656.3,213.9 668.1,213.9 668.1,216.9 679.8,216.9 679.8,217.7 691.6,217.7 691.6,219.2 703.4,219.2 703.4,212.0 715.2,212.0 715.2,204.8 726.9,204.8 726.9,212.4 738.7,212.4 738.7,205.7 750.5,205.7 750.5,196.3 762.3,196.3 762.3,187.1 774.0,187.1 774.0,202.4 785.8,202.4 785.8,205.1 797.6,205.1 797.6,206.3 809.4,206.3 809.4,204.1 821.1,204.1 821.1,190.8 832.9,190.8 832.9,215.6 844.7,215.6 844.7,212.9 856.5,212.9 856.5,208.9 868.2,208.9 868.2,210.3 880.0,210.3 880.0,216.2" fill="none" stroke="#5b616b" stroke-width="1.5" stroke-linejoin="round"/><polyline points="44.0,180.0 55.8,180.0 55.8,179.9 67.5,179.9 67.5,179.5 79.3,179.5 79.3,222.6 91.1,222.6 91.1,224.4 102.9,224.4 102.9,215.2 114.6,215.2 114.6,237.9 126.4,237.9 126.4,300.0 138.2,300.0 138.2,192.9 150.0,192.9 150.0,181.2 161.7,181.2 161.7,182.0 173.5,182.0 173.5,181.9 185.3,181.9 185.3,182.7 197.1,182.7 197.1,182.5 208.8,182.5 208.8,182.7 220.6,182.7 220.6,182.5 232.4,182.5 232.4,182.0 244.2,182.0 244.2,209.7 255.9,209.7 255.9,207.8 267.7,207.8 267.7,221.9 279.5,221.9 279.5,258.9 291.3,258.9 291.3,231.0 303.0,231.0 303.0,226.3 314.8,226.3 314.8,189.1 326.6,189.1 326.6,179.7 338.4,179.7 338.4,179.9 350.1,179.9 350.1,180.5 361.9,180.5 361.9,188.0 373.7,188.0 373.7,198.0 385.5,198.0 385.5,207.6 397.2,207.6 397.2,236.1 409.0,236.1 409.0,300.0 420.8,300.0 420.8,211.4 432.6,211.4 432.6,208.0 444.3,208.0 444.3,202.4 456.1,202.4 456.1,180.7 467.9,180.7 467.9,179.8 479.7,179.8 479.7,180.4 491.4,180.4 491.4,180.6 503.2,180.6 503.2,180.8 515.0,180.8 515.0,180.4 526.8,180.4 526.8,277.9 538.5,277.9 538.5,213.7 550.3,213.7 550.3,211.7 562.1,211.7 562.1,300.0 573.9,300.0 573.9,223.3 585.6,223.3 585.6,223.1 597.4,223.1 597.4,180.5 609.2,180.5 609.2,184.1 621.0,184.1 621.0,179.3 632.7,179.3 632.7,179.3 644.5,179.3 644.5,180.2 656.3,180.2 656.3,223.0 668.1,223.0 668.1,229.9 679.8,229.9 679.8,300.0 691.6,300.0 691.6,300.0 703.4,300.0 703.4,227.7 715.2,227.7 715.2,229.5 726.9,229.5 726.9,215.9 738.7,215.9 738.7,181.8 750.5,181.8 750.5,180.6 762.3,180.6 762.3,180.7 774.0,180.7 774.0,182.3 785.8,182.3 785.8,182.6 797.6,182.6 797.6,181.7 809.4,181.7 809.4,199.3 821.1,199.3 821.1,300.0 832.9,300.0 832.9,189.0 844.7,189.0 844.7,202.7 856.5,202.7 856.5,199.2 868.2,199.2 868.2,181.5 880.0,181.5 880.0,181.7" fill="none" stroke="#e9eaec" stroke-width="2" stroke-linejoin="round"/><text x="185.3" y="318" text-anchor="middle">20 Jan</text><text x="467.9" y="318" text-anchor="middle">21 Jan</text><text x="750.5" y="318" text-anchor="middle">22 Jan</text></svg>
+        <div class="cap">20 to 22 January 2025, simulated 500 kW site in Dallas. PowerNet paid $39/MWh for its energy; the unscheduled site paid $43/MWh.</div>
+      </div>
+      <div class="label gap">Results</div>
+      <div class="fig gap">
+        <div class="key"><span><i style="background:#3a3f47"></i>Jobs run as they arrive, no battery</span><span><i style="background:#8d929b"></i>Forecast-driven controller</span><span><i style="background:#e9eaec"></i>Known prices</span></div>
+        <svg viewBox="0 0 880 220" role="img"><line x1="40" x2="880" y1="192.0" y2="192.0" stroke="#24272d"/><text x="32" y="196.0" text-anchor="end">$0</text><line x1="40" x2="880" y1="148.0" y2="148.0" stroke="#24272d"/><text x="32" y="152.0" text-anchor="end">$20</text><line x1="40" x2="880" y1="104.0" y2="104.0" stroke="#24272d"/><text x="32" y="108.0" text-anchor="end">$40</text><line x1="40" x2="880" y1="60.0" y2="60.0" stroke="#24272d"/><text x="32" y="64.0" text-anchor="end">$60</text><line x1="40" x2="880" y1="16.0" y2="16.0" stroke="#24272d"/><text x="32" y="20.0" text-anchor="end">$80</text><rect x="130.0" y="29.0" width="32.0" height="163.0" fill="#3a3f47"><title>74.1</title></rect><rect x="164.0" y="41.6" width="32.0" height="150.4" fill="#8d929b"><title>68.3</title></rect><rect x="198.0" y="63.7" width="32.0" height="128.3" fill="#e9eaec"><title>58.3</title></rect><text x="180.0" y="212" text-anchor="middle">Winter</text><rect x="410.0" y="27.7" width="32.0" height="164.3" fill="#3a3f47"><title>74.7</title></rect><rect x="444.0" y="41.7" width="32.0" height="150.3" fill="#8d929b"><title>68.3</title></rect><rect x="478.0" y="74.3" width="32.0" height="117.7" fill="#e9eaec"><title>53.5</title></rect><text x="460.0" y="212" text-anchor="middle">Spring</text><rect x="690.0" y="60.6" width="32.0" height="131.4" fill="#3a3f47"><title>59.7</title></rect><rect x="724.0" y="65.7" width="32.0" height="126.3" fill="#8d929b"><title>57.4</title></rect><rect x="758.0" y="81.8" width="32.0" height="110.2" fill="#e9eaec"><title>50.1</title></rect><text x="740.0" y="212" text-anchor="middle">Fall</text></svg>
+        <div class="cap">Power cost per MWh of computing delivered, in dollars. Two-week windows in 2025.</div>
+      </div>
+      <a class="cta gap" href="https://github.com/cpeiren/powernet">Read the code on GitHub <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <p class="fine gap">Simulated 500 kW GPU site in Dallas (ERCOT North load zone) with a 0.5 MW / 2 MWh battery, real 2025 real-time prices and temperatures, three two-week windows starting 15 January, 1 April and 1 November. Optimized schedules push some deferrable work past the end of the window, so results are per MWh of compute delivered inside it. Summer windows are left out: their savings depend on knowing ERCOT's four coincident-peak hours in advance.</p>
+    </div>
+  </div>
+</section>
+
+<section class="next pager">
+  <div class="wrap">
+    <ul class="rows links">
+      <li><a class="row" href="/capabilities/powernet/"><span class="n">&larr; Back</span><span class="name">PowerNet</span><span class="desc"></span></a></li>
+      <li><a class="row" href="/capabilities/tradecontrol/"><span class="n">Next</span><span class="name">TradeControl</span><span class="desc"></span><span class="arr" aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; <span id="yr">2026</span> DeepPower Technology</span>
+    <span>deeppower-tech.com</span>
+  </div>
+</footer>
+</body>
+</html>
